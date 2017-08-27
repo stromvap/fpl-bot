@@ -1,5 +1,6 @@
 package fpl.bot.price.changes;
 
+import fpl.bot.api.discord.DiscordPoster;
 import fpl.bot.api.fplstatistics.FplStatisticsService;
 import fpl.bot.api.fplstatistics.Player;
 import fpl.bot.api.slack.SlackPoster;
@@ -13,8 +14,11 @@ import org.springframework.stereotype.Component;
 public class PriceChangesWarner {
     private static final Logger log = Logger.getLogger(PriceChangesWarner.class);
 
-    @Value("${priceChangeChannel}")
-    String priceChangeChannel;
+    @Value("${slackPriceChangeChannel}")
+    String slackPriceChangeChannel;
+
+    @Value("${discordPriceChangeWebhook}")
+    String discordPriceChangeWebhook;
 
     @Autowired
     private FplStatisticsService fplStatisticsService;
@@ -22,12 +26,15 @@ public class PriceChangesWarner {
     @Autowired
     private SlackPoster slackPoster;
 
+    @Autowired
+    private DiscordPoster discordPoster;
+
     @Scheduled(cron = "0 0 21 * * ?")
     public void checkPotentialPriceChanges() {
-        StringBuilder slackMessage = new StringBuilder();
+        StringBuilder message = new StringBuilder();
 
         for (Player playerLikelyToRise : fplStatisticsService.getPlayersAtRisk()) {
-            slackMessage.
+            message.
                     append(playerLikelyToRise.isAboutToRise() ? ":green_heart:" : ":red_circle:").
                     append(":grey_question: *").
                     append(playerLikelyToRise.getName()).
@@ -40,6 +47,7 @@ public class PriceChangesWarner {
                     append("\n");
         }
 
-        slackPoster.sendMessage(slackMessage.toString(), priceChangeChannel);
+        slackPoster.sendMessage(message.toString(), slackPriceChangeChannel);
+        discordPoster.sendMessage(message.toString(), discordPriceChangeWebhook);
     }
 }

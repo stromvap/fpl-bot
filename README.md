@@ -5,7 +5,7 @@ A very simple Fantasy Premier League bot that can post:
 * Price change warnings
 * Price changes
 
-Currently only Slack is supported.
+It can post to Slack and Discord.
 
 Live scoring and price changes are fetched from the API at fantasy.premierleague.com
 
@@ -19,7 +19,7 @@ The bot is written in Java 8 using Spring Boot 1.5.3 and Maven.
 
 The configuration file is located at `src/main/resources/application.properties`.
 
-Before it can run you need to update it to your liking, especially the `slackAuthToken`.
+Before the bot can run you need to update the configuration to your liking, especially the Slack Auth Token and the Discord Webhooks.
 
 ## How to run
 
@@ -28,8 +28,9 @@ Before it can run you need to update it to your liking, especially the `slackAut
 ## Currently running
 This bot is currently running and posting messages to: https://rfantasypl.slack.com - join by clicking here: https://join.slack.com/t/rfantasypl/shared_invite/MTg1NTU2NDE1MzAxLTE0OTUxNjY4MTktNzQxYzlhYWZkYg
 
+No Discord running as of yet.
+
 ## Roadmap
 Here is a brief list of TODO's.
 
-* Discord support
 * Automatically adjust what the current gameweek is

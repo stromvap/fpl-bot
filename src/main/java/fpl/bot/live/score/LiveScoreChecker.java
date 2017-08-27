@@ -1,5 +1,6 @@
 package fpl.bot.live.score;
 
+import fpl.bot.api.discord.DiscordPoster;
 import fpl.bot.api.slack.SlackPoster;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,14 @@ public class LiveScoreChecker {
     @Value("${ignoreEventsBeforeApplicationStart}")
     boolean ignoreEventsBeforeApplicationStart;
 
-    @Value("${liveScoreChannel}")
-    String liveScoreChannel;
-
     @Value("${liveScoreEnabled}")
     boolean liveScoreEnabled;
+
+    @Value("${slackLiveScoreChannel}")
+    String slackLiveScoreChannel;
+
+    @Value("${discordLiveScoreWebhook}")
+    String discordLiveScoreWebhook;
 
     @Autowired
     private FplOfficialLiveScoreFetcher fplOfficialLiveScoreFetcher;
@@ -33,9 +37,12 @@ public class LiveScoreChecker {
     @Autowired
     private SlackPoster slackPoster;
 
+    @Autowired
+    private DiscordPoster discordPoster;
+
     @Scheduled(fixedRate = SCHEDULE_RATE_IN_SECONDS * 1000)
     public void checkLiveScores() {
-        if(!liveScoreEnabled) {
+        if (!liveScoreEnabled) {
             log.info("Live Score is not enabled, skipping check...");
             return;
         }
@@ -54,12 +61,13 @@ public class LiveScoreChecker {
             return;
         }
 
-        StringBuilder slackMessage = new StringBuilder();
+        StringBuilder message = new StringBuilder();
 
         for (Event event : newEvents) {
-            slackMessage.append(event.getSlackMessage());
+            message.append(event.getSlackMessage());
         }
 
-        slackPoster.sendMessage(slackMessage.toString(), liveScoreChannel);
+        slackPoster.sendMessage(message.toString(), slackLiveScoreChannel);
+        discordPoster.sendMessage(message.toString(), discordLiveScoreWebhook);
     }
 }

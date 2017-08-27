@@ -1,5 +1,6 @@
 package fpl.bot.price.changes;
 
+import fpl.bot.api.discord.DiscordPoster;
 import fpl.bot.api.fpl.FplOfficialGameDataService;
 import fpl.bot.api.fpl.FplOfficialPlayer;
 import fpl.bot.api.slack.SlackPoster;
@@ -20,14 +21,20 @@ public class PriceChangesChecker {
 
     private static final Logger log = Logger.getLogger(PriceChangesChecker.class);
 
-    @Value("${priceChangeChannel}")
-    String priceChangeChannel;
+    @Value("${slackPriceChangeChannel}")
+    String slackPriceChangeChannel;
+
+    @Value("${discordPriceChangeWebhook}")
+    String discordPriceChangeWebhook;
 
     @Autowired
     private FplOfficialGameDataService fplOfficialGameDataService;
 
     @Autowired
     private SlackPoster slackPoster;
+
+    @Autowired
+    private DiscordPoster discordPoster;
 
     private List<FplOfficialPlayer> players;
 
@@ -75,7 +82,8 @@ public class PriceChangesChecker {
 
         players = updatedPlayers;
 
-        slackPoster.sendMessage(risersSlackMessage.toString() + fallersSlackMessage.toString(), priceChangeChannel);
+        slackPoster.sendMessage(risersSlackMessage.toString() + fallersSlackMessage.toString(), slackPriceChangeChannel);
+        discordPoster.sendMessage(risersSlackMessage.toString() + fallersSlackMessage.toString(), discordPriceChangeWebhook);
     }
 
     private boolean hasPlayerChangedPrice(FplOfficialPlayer p) {
