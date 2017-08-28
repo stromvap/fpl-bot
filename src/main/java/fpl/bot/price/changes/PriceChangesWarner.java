@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import static org.apache.commons.lang3.StringUtils.rightPad;
+
 @Component
 public class PriceChangesWarner {
     private static final Logger log = Logger.getLogger(PriceChangesWarner.class);
@@ -29,25 +31,27 @@ public class PriceChangesWarner {
     @Autowired
     private DiscordPoster discordPoster;
 
-    @Scheduled(cron = "0 0 21 * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     public void checkPotentialPriceChanges() {
-        StringBuilder message = new StringBuilder();
+        StringBuilder risersMessage = new StringBuilder();
+        risersMessage.append("LIKELY RISERS:\n");
+
+        StringBuilder fallersMessage = new StringBuilder();
+        fallersMessage.append("LIKELY FALLERS:\n");
 
         for (Player playerLikelyToRise : fplStatisticsService.getPlayersAtRisk()) {
-            message.
-                    append(playerLikelyToRise.isAboutToRise() ? ":green_heart:" : ":red_circle:").
-                    append(":grey_question: *").
-                    append(playerLikelyToRise.getName()).
-                    append("* is likely to *").
-                    append(playerLikelyToRise.isAboutToRise() ? "rise" : "fall").
-                    append("* tomorrow! He is at *").
-                    append(playerLikelyToRise.getPriceChangePercentage()).
-                    append("%* now. Current price: ").
+            (playerLikelyToRise.isAboutToRise() ? risersMessage : fallersMessage).
+                    append(rightPad(playerLikelyToRise.getName(), 20, " ")).
+                    append("at ").
+                    append(rightPad(playerLikelyToRise.getPriceChangePercentage() + "%.", 8, " ")).
+                    append(" Current price: ").
                     append(playerLikelyToRise.getPrice()).
                     append("\n");
         }
 
-        slackPoster.sendMessage(message.toString(), slackPriceChangeChannel);
-        discordPoster.sendMessage(message.toString(), discordPriceChangeWebhook);
+        String message = "```" + risersMessage.toString() + "\n" + fallersMessage.toString() + "```";
+
+        slackPoster.sendMessage(message, slackPriceChangeChannel);
+        discordPoster.sendMessage(message, discordPriceChangeWebhook);
     }
 }

@@ -21,6 +21,9 @@ public class DiscordPoster {
     boolean postToDiscord;
 
     public void sendMessage(String message, String webhook) {
+        // Ugly hack because * is bold in Slack but ** is bold in Discord
+        message = message.replaceAll("\\*", "**");
+
         if (!postToDiscord) {
             log.info("postToDiscord was disabled, not posting to Discord");
             log.info("The following message would have been sent to webhook " + webhook + ": " + message);

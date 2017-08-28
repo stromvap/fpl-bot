@@ -55,7 +55,8 @@ public class FplStatisticsService {
 
     private FplStatistics getFplStatistics(int offset, int length) {
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromHttpUrl("http://www.fplstatistics.co.uk/Home/AjaxPricesHandler").
-                queryParam("iselRow", 298).
+                // Not really sure what this number is but it changes sometimes
+                queryParam("iselRow", 299).
                 queryParam("iDisplayStart", offset).
                 queryParam("iDisplayLength", length);
 

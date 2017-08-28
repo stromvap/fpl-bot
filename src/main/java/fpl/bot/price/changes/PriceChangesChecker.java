@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.rightPad;
+
 @Component
 public class PriceChangesChecker {
     private static final long SCHEDULE_RATE_IN_SECONDS = 3600;
@@ -55,8 +57,11 @@ public class PriceChangesChecker {
             return;
         }
 
-        StringBuilder risersSlackMessage = new StringBuilder();
-        StringBuilder fallersSlackMessage = new StringBuilder();
+        StringBuilder risersMessage = new StringBuilder();
+        risersMessage.append("RISERS:\n");
+
+        StringBuilder fallersMessage = new StringBuilder();
+        fallersMessage.append("FALLERS:\n");
 
         for (FplOfficialPlayer player : playersThatChangedPrice) {
             Optional<FplOfficialPlayer> oldPlayerInformation = findPlayer(player.getId());
@@ -64,15 +69,9 @@ public class PriceChangesChecker {
             if (oldPlayerInformation.isPresent()) {
                 boolean rised = player.getCost() > oldPlayerInformation.get().getCost();
 
-                (rised ? risersSlackMessage : fallersSlackMessage).
-                        append(rised ? ":green_heart:" : ":red_circle:").
-                        append(" *").
-                        append(player.getFirstName()).
-                        append(" ").
-                        append(player.getSecondName()).
-                        append("* price went ").
-                        append(rised ? "up" : "down").
-                        append(". New price: ").
+                (rised ? risersMessage : fallersMessage).
+                        append(rightPad(player.getFirstName() + " " + player.getSecondName(), 20, " ")).
+                        append("New price: ").
                         append(new DecimalFormat("#.0").format((double) player.getCost() / 10d)).
                         append("\n");
             } else {
@@ -82,8 +81,10 @@ public class PriceChangesChecker {
 
         players = updatedPlayers;
 
-        slackPoster.sendMessage(risersSlackMessage.toString() + fallersSlackMessage.toString(), slackPriceChangeChannel);
-        discordPoster.sendMessage(risersSlackMessage.toString() + fallersSlackMessage.toString(), discordPriceChangeWebhook);
+        String message = "```" + risersMessage.toString() + "\n" + fallersMessage.toString() + "```";
+
+        slackPoster.sendMessage(message, slackPriceChangeChannel);
+        discordPoster.sendMessage(message, discordPriceChangeWebhook);
     }
 
     private boolean hasPlayerChangedPrice(FplOfficialPlayer p) {
