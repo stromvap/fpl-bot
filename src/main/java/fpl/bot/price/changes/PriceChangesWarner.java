@@ -31,7 +31,7 @@ public class PriceChangesWarner {
     @Autowired
     private DiscordPoster discordPoster;
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 21 * * ?")
     public void checkPotentialPriceChanges() {
         StringBuilder risersMessage = new StringBuilder();
         risersMessage.append("LIKELY RISERS:\n");
