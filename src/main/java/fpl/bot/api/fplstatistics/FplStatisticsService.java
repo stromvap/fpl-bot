@@ -1,13 +1,15 @@
 package fpl.bot.api.fplstatistics;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.log4j.Logger;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -54,14 +56,13 @@ public class FplStatisticsService {
     }
 
     private FplStatistics getFplStatistics(int offset, int length) {
-        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromHttpUrl("http://www.fplstatistics.co.uk/Home/AjaxPricesHandler").
-                // Not really sure what this number is but it changes sometimes
-                queryParam("iselRow", 299).
-                queryParam("iDisplayStart", offset).
-                queryParam("iDisplayLength", length);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<FplStatistics> responseEntity = restTemplate.exchange(urlBuilder.toUriString(), HttpMethod.GET, null, FplStatistics.class);
-        return responseEntity.getBody();
+        WebClient webClient = WebClient.create("http://www.fplstatistics.co.uk/Home/AjaxPricesHandler", Collections.singletonList(new JacksonJaxbJsonProvider()));
+        ClientConfiguration config = WebClient.getConfig(webClient);
+        config.getInInterceptors().add(new LoggingInInterceptor());
+        config.getOutInterceptors().add(new LoggingOutInterceptor());
+        webClient.query("iselRow", 300);
+        webClient.query("iDisplayStart", offset);
+        webClient.query("iDisplayLength", length);
+        return webClient.get(FplStatistics.class);
     }
 }
