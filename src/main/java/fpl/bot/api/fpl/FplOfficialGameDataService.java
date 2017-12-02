@@ -17,6 +17,7 @@ public class FplOfficialGameDataService {
 
     @PostConstruct
     public void updateGameData() {
+        log.info("Updating FPL Official game data..");
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<FplOfficialGameData> responseEntity = restTemplate.exchange("https://fantasy.premierleague.com/drf/bootstrap-static", HttpMethod.GET, null, FplOfficialGameData.class);
         fplOfficialGameData = responseEntity.getBody();
