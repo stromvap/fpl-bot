@@ -53,6 +53,7 @@ public class FplOfficialLiveScoreFetcher {
     }
 
     private JsonNode getGameWeekJson() {
+        log.info("Checking events for gameweek {}" + gameweek);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity = restTemplate.exchange("https://fantasy.premierleague.com/drf/fixtures/?event=" + gameweek, HttpMethod.GET, null, String.class);
 
