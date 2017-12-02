@@ -40,8 +40,17 @@ public class PriceChangesChecker {
 
     private List<FplOfficialPlayer> players;
 
-    @Scheduled(fixedRate = SCHEDULE_RATE_IN_SECONDS * 1000)
-    public void checkPriceChanges() {
+    @Scheduled(cron = "0 0 5-1 * * ?")
+    public void checkPriceChangesOnceAnHourToKeepTheDataFresh() {
+        checkPriceChanges();
+    }
+
+    @Scheduled(cron = "0 0/10 2-4 * * ?")
+    public void checkPriceChangesMoreOftenDuringChangeHoursSoWeCanFindTheChangesQuick() {
+        checkPriceChanges();
+    }
+
+    private synchronized void checkPriceChanges() {
         List<FplOfficialPlayer> updatedPlayers = fplOfficialGameDataService.getPlayers();
 
         if (players == null) {
