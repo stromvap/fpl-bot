@@ -40,7 +40,7 @@ public class PriceChangesChecker {
 
     private List<FplOfficialPlayer> players;
 
-    @Scheduled(cron = "0 0 5-1 * * ?")
+    @Scheduled(cron = "0 0 1-2,5-12 * * ?")
     public void checkPriceChangesOnceAnHourToKeepTheDataFresh() {
         checkPriceChanges();
     }
