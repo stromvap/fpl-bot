@@ -27,13 +27,28 @@ public class FplStatisticsService {
     public List<Player> getPlayersAtRisk() {
         List<Player> playersAtRisk = new ArrayList<>();
 
-        FplStatistics fplStatistics = getFplStatistics(0, NUMBER_OF_PLAYERS_TO_FETCH);
+        int iselRow = getIselRow();
+
+        FplStatistics fplStatistics = getFplStatistics(0, NUMBER_OF_PLAYERS_TO_FETCH, iselRow);
         playersAtRisk.addAll(extractPlayers(fplStatistics));
 
-        fplStatistics = getFplStatistics(fplStatistics.getTotalNumberOfPlayers() - NUMBER_OF_PLAYERS_TO_FETCH, fplStatistics.getTotalNumberOfPlayers());
+        fplStatistics = getFplStatistics(fplStatistics.getTotalNumberOfPlayers() - NUMBER_OF_PLAYERS_TO_FETCH, fplStatistics.getTotalNumberOfPlayers(), iselRow);
         playersAtRisk.addAll(extractPlayers(fplStatistics));
 
         return playersAtRisk;
+    }
+
+    private int getIselRow() {
+        WebClient webClient = WebClient.create("http://www.fplstatistics.co.uk/");
+        ClientConfiguration config = WebClient.getConfig(webClient);
+        config.getInInterceptors().add(new LoggingInInterceptor());
+        config.getOutInterceptors().add(new LoggingOutInterceptor());
+
+        String html = webClient.get(String.class);
+
+        int iselRowIndex = html.indexOf("iselRow");
+        String iselRowString = html.substring(iselRowIndex, iselRowIndex+30);
+        return Integer.parseInt(iselRowString.replaceAll("\\D", ""));
     }
 
     private List<Player> extractPlayers(FplStatistics fplStatistics) {
@@ -55,12 +70,12 @@ public class FplStatisticsService {
         return players;
     }
 
-    private FplStatistics getFplStatistics(int offset, int length) {
+    private FplStatistics getFplStatistics(int offset, int length, int iselRow) {
         WebClient webClient = WebClient.create("http://www.fplstatistics.co.uk/Home/AjaxPricesHandler", Collections.singletonList(new JacksonJaxbJsonProvider()));
         ClientConfiguration config = WebClient.getConfig(webClient);
         config.getInInterceptors().add(new LoggingInInterceptor());
         config.getOutInterceptors().add(new LoggingOutInterceptor());
-        webClient.query("iselRow", 300);
+        webClient.query("iselRow", iselRow);
         webClient.query("iDisplayStart", offset);
         webClient.query("iDisplayLength", length);
         return webClient.get(FplStatistics.class);
