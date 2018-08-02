@@ -27,9 +27,7 @@ Before the bot can run you need to update the configuration to your liking, espe
 
 ## Currently running
 
-Here are two places that the bot is currently posting messages to:
-
-* **Slack - r/FantasyPL** - [Click here to join](https://join.slack.com/t/rfantasypl/shared_invite/MTg1NTU2NDE1MzAxLTE0OTUxNjY4MTktNzQxYzlhYWZkYg)
+The bot is currently posting messages to:
 * **Discord - r/FantasyPL** - [Click here to join](https://discordapp.com/invite/GgcY5gK)
 
 ## Roadmap
