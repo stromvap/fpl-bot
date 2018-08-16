@@ -39,7 +39,8 @@ When the bot posts goals it will expect team icons to be avaliable in Slack usin
 2. Install ImageMagick
 3. Clean all the ICO file names with this bash command (ImageMagick cant handle spaces): `for f in *\ *; do mv "$f" "${f// /_}"; done`
 4. Convert them from ICO to PNG: `for file in *.ico; do convert $file 128x128 new-$file.png; done`
-5. Rename the outputted icon names to match what the bot expects: [a See here](src/main/java/fpl/bot/live/score/FplOfficialLiveScoreFetcher.java#L114-L135)
+5. Rename the outputted icon names to match what the bot expects: [See here](src/main/java/fpl/bot/live/score/FplOfficialLiveScoreFetcher.java#L114-L135)
+6. Upload the icons to your Slack or Discord server
 
 ### UNIX
 If you are running UNIX i think you can manage yourself, it will propably be similar to the OSX way
