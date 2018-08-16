@@ -132,5 +132,8 @@ public class FplOfficialLiveScoreFetcher {
         teamSlackIcons.put(57, ":watford:");
         teamSlackIcons.put(35, ":west_bromwich:");
         teamSlackIcons.put(21, ":west_ham_united:");
+        teamSlackIcons.put(97, ":cardiff:");
+        teamSlackIcons.put(54, ":fulham:");
+        teamSlackIcons.put(39, ":wolves:");
     }
 }
