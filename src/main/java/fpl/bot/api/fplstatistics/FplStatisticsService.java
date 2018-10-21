@@ -21,8 +21,8 @@ public class FplStatisticsService {
     private static final int NUMBER_OF_PLAYERS_TO_FETCH = 50;
 
     private static final int INDEX_PLAYER_NAME = 1;
-    private static final int INDEX_PRICE = 6;
-    private static final int INDEX_PRICE_CHANGE_PERCENTAGE = 10;
+    private static final int INDEX_PRICE = 7;
+    private static final int INDEX_PRICE_CHANGE_PERCENTAGE = 11;
 
     public List<Player> getPlayersAtRisk() {
         List<Player> playersAtRisk = new ArrayList<>();

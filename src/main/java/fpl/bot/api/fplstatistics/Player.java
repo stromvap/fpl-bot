@@ -32,4 +32,9 @@ public class Player {
     public boolean isAboutToRise() {
         return priceChangePercentage >= FplStatisticsService.THRESHOLD;
     }
+
+    @Override
+    public String toString() {
+        return "Player{" + "name='" + name + '\'' + ", price=" + price + ", priceChangePercentage=" + priceChangePercentage + '}';
+    }
 }
