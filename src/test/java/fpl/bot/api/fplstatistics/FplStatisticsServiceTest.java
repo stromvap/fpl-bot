@@ -28,5 +28,6 @@ public class FplStatisticsServiceTest {
         log.info(playersAtRisk.toString());
 
         assertThat(playersAtRisk).isNotEmpty();
+        assertThat(playersAtRisk).doesNotHaveDuplicates();
     }
 }
