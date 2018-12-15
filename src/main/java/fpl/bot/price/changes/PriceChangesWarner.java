@@ -44,7 +44,7 @@ public class PriceChangesWarner {
                     append(rightPad(playerLikelyToRise.getName(), 20, " ")).
                     append("at ").
                     append(rightPad(playerLikelyToRise.getPriceChangePercentage() + "%.", 8, " ")).
-                    append(" Current price: ").
+                    append(" £ now: ").
                     append(playerLikelyToRise.getPrice()).
                     append("\n");
         }
