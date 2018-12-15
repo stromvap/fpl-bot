@@ -29,5 +29,10 @@ public class FplStatisticsServiceTest {
 
         assertThat(playersAtRisk).isNotEmpty();
         assertThat(playersAtRisk).doesNotHaveDuplicates();
+
+        Player aPlayer = playersAtRisk.get(0);
+        assertThat(aPlayer.getName()).isNotBlank();
+        assertThat(aPlayer.getPrice()).isBetween(3d, 15d);
+        assertThat(aPlayer.getPriceChangePercentage()).isBetween(-110d, 110d);
     }
 }

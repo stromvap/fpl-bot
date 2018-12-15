@@ -67,6 +67,16 @@ public class FplStatisticsService {
         config.getInInterceptors().add(new LoggingInInterceptor());
         config.getOutInterceptors().add(new LoggingOutInterceptor());
         webClient.query("iselRow", iselRow);
+
+        webClient.header("Host", "www.fplstatistics.co.uk");
+        webClient.header("Connection", "keep-alive");
+        webClient.header("Accept", "application/json, text/javascript, */*; q=0.01");
+        webClient.header("X-Requested-With", "XMLHttpRequest");
+        webClient.header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36");
+        webClient.header("Referer", "http://www.fplstatistics.co.uk/");
+        webClient.header("Accept-Encoding", "gzip, deflate");
+        webClient.header("Accept-Language", "en-US,en;q=0.9,sv;q=0.8");
+
         return webClient.get(FplStatistics.class);
     }
 }
