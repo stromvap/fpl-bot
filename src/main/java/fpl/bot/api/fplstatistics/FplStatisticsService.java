@@ -1,5 +1,6 @@
 package fpl.bot.api.fplstatistics;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -8,9 +9,14 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class FplStatisticsService {
@@ -21,6 +27,8 @@ public class FplStatisticsService {
     private static final int INDEX_PLAYER_NAME = 1;
     private static final int INDEX_PRICE = 7;
     private static final int INDEX_PRICE_CHANGE_PERCENTAGE = 11;
+
+    private static final Pattern jsonPattern = Pattern.compile("\\{.*}");
 
     public List<Player> getPlayersAtRisk() {
         int iselRow = getIselRow();
@@ -36,10 +44,27 @@ public class FplStatisticsService {
         config.getOutInterceptors().add(new LoggingOutInterceptor());
 
         String html = webClient.get(String.class);
+        return parseIselRow(html);
+    }
 
-        int iselRowIndex = html.indexOf("iselRow");
-        String iselRowString = html.substring(iselRowIndex, iselRowIndex + 30);
-        return Integer.parseInt(iselRowString.replaceAll("\\D", ""));
+    int parseIselRow(String html) {
+        String iselRowHtml = new BufferedReader(new StringReader(html)).
+                lines().
+                filter(s -> s.contains("iselRow")).
+                findFirst().
+                orElseThrow(() -> new IllegalStateException("Failed to find iselRow"));
+
+        Matcher iselRowMatcher = jsonPattern.matcher(iselRowHtml);
+        if (iselRowMatcher.find()) {
+            String iselRowJson = iselRowMatcher.group();
+            try {
+                return Integer.parseInt(new ObjectMapper().readValue(iselRowJson, IselRow.class).value);
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to parse iselRow from json: " + iselRowJson);
+            }
+        }
+
+        throw new IllegalStateException("Failed to find iselRow");
     }
 
     private List<Player> extractPlayers(FplStatistics fplStatistics) {
@@ -78,5 +103,26 @@ public class FplStatisticsService {
         webClient.header("Accept-Language", "en-US,en;q=0.9,sv;q=0.8");
 
         return webClient.get(FplStatistics.class);
+    }
+
+    private static class IselRow {
+        private String name;
+        private String value;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 }

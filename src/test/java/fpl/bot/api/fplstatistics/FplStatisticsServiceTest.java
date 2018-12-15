@@ -22,6 +22,34 @@ public class FplStatisticsServiceTest {
     private FplStatisticsService unitUnderTest;
 
     @Test
+    public void verify_That_A_Low_IselRow_Can_Be_Parsed() {
+        String html = "aoData.push({ \"name\": \"iselRow\", \"value\": 1 });";
+        int iselRow = unitUnderTest.parseIselRow(html);
+        assertThat(iselRow).isEqualTo(1);
+    }
+
+    @Test
+    public void verify_That_A_High_IselRow_Can_Be_Parsed() {
+        String html = "aoData.push({ \"name\": \"iselRow\", \"value\": 331556 });";
+        int iselRow = unitUnderTest.parseIselRow(html);
+        assertThat(iselRow).isEqualTo(331556);
+    }
+
+    @Test
+    public void verify_That_A_Positive_IselRow_Can_Be_Parsed() {
+        String html = "aoData.push({ \"name\": \"iselRow\", \"value\": 331 });";
+        int iselRow = unitUnderTest.parseIselRow(html);
+        assertThat(iselRow).isEqualTo(331);
+    }
+
+    @Test
+    public void verify_That_A_Negative_IselRow_Can_Be_Parsed() {
+        String html = "aoData.push({ \"name\": \"iselRow\", \"value\": -331 });";
+        int iselRow = unitUnderTest.parseIselRow(html);
+        assertThat(iselRow).isEqualTo(-331);
+    }
+
+    @Test
     public void verify_That_FplStatistics_Can_Be_Called() {
         List<Player> playersAtRisk = unitUnderTest.getPlayersAtRisk();
 
