@@ -90,7 +90,7 @@ public class FplStatisticsService {
     }
 
     private FplStatistics getFplStatistics(int iselRow) {
-        WebClient webClient = WebClient.create("http://www.fplstatistics.co.uk/Home/AjaxPricesCHandler", Collections.singletonList(new JacksonJaxbJsonProvider()));
+        WebClient webClient = WebClient.create("http://www.fplstatistics.co.uk/Home/AjaxPricesDHandler", Collections.singletonList(new JacksonJaxbJsonProvider()));
         ClientConfiguration config = WebClient.getConfig(webClient);
         config.getInInterceptors().add(new LoggingInInterceptor());
         config.getOutInterceptors().add(new LoggingOutInterceptor());
