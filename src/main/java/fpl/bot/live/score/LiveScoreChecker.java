@@ -1,8 +1,7 @@
 package fpl.bot.live.score;
 
-import fpl.bot.api.discord.DiscordPoster;
-import fpl.bot.api.slack.SlackPoster;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +14,7 @@ import java.util.List;
 public class LiveScoreChecker {
     private static final long SCHEDULE_RATE_IN_SECONDS = 30;
 
-    private static final Logger log = Logger.getLogger(LiveScoreChecker.class);
+    private static final Logger log = LoggerFactory.getLogger(LiveScoreChecker.class);
 
     private LocalDateTime lastTimeChecked = LocalDateTime.MIN;
 
@@ -25,20 +24,8 @@ public class LiveScoreChecker {
     @Value("${liveScoreEnabled}")
     boolean liveScoreEnabled;
 
-    @Value("${slackLiveScoreChannel}")
-    String slackLiveScoreChannel;
-
-    @Value("${discordLiveScoreWebhook}")
-    String discordLiveScoreWebhook;
-
     @Autowired
     private FplOfficialLiveScoreFetcher fplOfficialLiveScoreFetcher;
-
-    @Autowired
-    private SlackPoster slackPoster;
-
-    @Autowired
-    private DiscordPoster discordPoster;
 
     @Scheduled(fixedRate = SCHEDULE_RATE_IN_SECONDS * 1000)
     public void checkLiveScores() {
@@ -67,7 +54,6 @@ public class LiveScoreChecker {
             message.append(event.getSlackMessage());
         }
 
-        slackPoster.sendMessage(message.toString(), slackLiveScoreChannel);
-        discordPoster.sendMessage(message.toString(), discordLiveScoreWebhook);
+        // TODO: Implement sending here, perhaps via DiscordBot
     }
 }

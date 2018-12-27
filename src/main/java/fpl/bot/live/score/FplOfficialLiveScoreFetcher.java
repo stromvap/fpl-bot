@@ -3,10 +3,11 @@ package fpl.bot.live.score;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fpl.bot.api.fpl.FplOfficialEvent;
 import fpl.bot.api.fpl.FplOfficialGameDataService;
 import fpl.bot.api.fpl.FplOfficialPlayer;
-import fpl.bot.api.fpl.FplOfficialEvent;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class FplOfficialLiveScoreFetcher {
-    private static final Logger log = Logger.getLogger(FplOfficialLiveScoreFetcher.class);
+    private static final Logger log = LoggerFactory.getLogger(FplOfficialLiveScoreFetcher.class);
 
     private static final TypeReference<List<FplOfficialEvent>> listOfEventsTypeReference = new TypeReference<List<FplOfficialEvent>>() {
     };
@@ -60,7 +61,7 @@ public class FplOfficialLiveScoreFetcher {
         try {
             return new ObjectMapper().readTree(responseEntity.getBody());
         } catch (IOException e) {
-            log.error(e);
+            log.error("Failed to read events for gameweek", e);
             throw new IllegalStateException(e);
         }
     }
@@ -83,7 +84,7 @@ public class FplOfficialLiveScoreFetcher {
             ((List<FplOfficialEvent>) new ObjectMapper().readValue(jsonNode.get(FIELD_NAME_HOME).toString(), listOfEventsTypeReference)).forEach(e -> mapAndAdd(e, eventType));
             ((List<FplOfficialEvent>) new ObjectMapper().readValue(jsonNode.get(FIELD_NAME_AWAY).toString(), listOfEventsTypeReference)).forEach(e -> mapAndAdd(e, eventType));
         } catch (IOException e) {
-            log.error(e);
+            log.error("Failed to add events", e);
             throw new IllegalStateException(e);
         }
     }

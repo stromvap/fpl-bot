@@ -1,12 +1,11 @@
 package fpl.bot.price.changes;
 
-import fpl.bot.api.discord.DiscordPoster;
 import fpl.bot.api.fpl.FplOfficialGameDataService;
 import fpl.bot.api.fpl.FplOfficialPlayer;
-import fpl.bot.api.slack.SlackPoster;
-import org.apache.log4j.Logger;
+import fpl.bot.api.discord.DiscordBot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,24 +18,13 @@ import static org.apache.commons.lang3.StringUtils.rightPad;
 
 @Component
 public class PriceChangesChecker {
-    private static final long SCHEDULE_RATE_IN_SECONDS = 3600;
-
-    private static final Logger log = Logger.getLogger(PriceChangesChecker.class);
-
-    @Value("${slackPriceChangeChannel}")
-    String slackPriceChangeChannel;
-
-    @Value("${discordPriceChangeWebhook}")
-    String discordPriceChangeWebhook;
+    private static final Logger log = LoggerFactory.getLogger(PriceChangesChecker.class);
 
     @Autowired
     private FplOfficialGameDataService fplOfficialGameDataService;
 
     @Autowired
-    private SlackPoster slackPoster;
-
-    @Autowired
-    private DiscordPoster discordPoster;
+    private DiscordBot discordBot;
 
     private List<FplOfficialPlayer> players;
 
@@ -92,8 +80,7 @@ public class PriceChangesChecker {
 
         String message = "```" + risersMessage.toString() + "\n" + fallersMessage.toString() + "```";
 
-        slackPoster.sendMessage(message, slackPriceChangeChannel);
-        discordPoster.sendMessage(message, discordPriceChangeWebhook);
+        discordBot.sendMessageToPriceBotChannels(message);
     }
 
     private boolean hasPlayerChangedPrice(FplOfficialPlayer p) {

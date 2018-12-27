@@ -6,7 +6,11 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -21,7 +25,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class FplStatisticsService {
-    private static final Logger log = Logger.getLogger(FplStatisticsService.class);
+    private static final Logger log = LoggerFactory.getLogger(FplStatisticsService.class);
 
     static final double THRESHOLD = 99.0;
 
@@ -31,11 +35,17 @@ public class FplStatisticsService {
 
     private static final Pattern jsonPattern = Pattern.compile("\\{.*}");
 
+    @Cacheable("playersAtRisk")
     public List<Player> getPlayersAtRisk() {
         int iselRow = getIselRow();
 
         FplStatistics fplStatistics = getFplStatistics(iselRow);
         return extractPlayers(fplStatistics);
+    }
+
+    @CacheEvict(allEntries = true, cacheNames = {"playersAtRisk"})
+    @Scheduled(fixedDelay = 600_000)
+    public void cacheEvict() {
     }
 
     private int getIselRow() {
