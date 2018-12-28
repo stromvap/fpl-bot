@@ -11,7 +11,6 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 @Component
 public class DiscordBot {
@@ -51,7 +51,7 @@ public class DiscordBot {
     public void startJda() throws Exception {
         log.info("Trying to connect to Discord WebSocket");
 
-        if(discordToken.equalsIgnoreCase("changeit")) {
+        if (discordToken.equalsIgnoreCase("changeit")) {
             return;
         }
 
@@ -95,17 +95,21 @@ public class DiscordBot {
                     return;
                 }
 
-                Optional<Player> mentionedPlayerAtRisk = fplStatisticsService.getPlayersAtRisk().stream().
-                        filter(p -> StringUtils.containsIgnoreCase(msg, p.getName())).
-                        findFirst();
+                Optional<Player> mentionedPlayerAtRisk = getMentionedPlayer(msg);
 
                 if (mentionedPlayerAtRisk.isPresent()) {
                     Player p = mentionedPlayerAtRisk.get();
                     String friendlyResponse = friendlyReminderMessages.get(new Random().nextInt(friendlyReminderMessages.size()));
-                    textChannel.sendMessage(String.format(friendlyResponse, name, p.getName(), p.getPriceChangePercentage()+"")).queue();
+                    textChannel.sendMessage(String.format(friendlyResponse, name, p.getName(), p.getPriceChangePercentage() + "")).queue();
                 }
             }
         }
+    }
+
+    Optional<Player> getMentionedPlayer(String msg) {
+        return fplStatisticsService.getPlayersAtRisk().stream().
+                filter(p -> Pattern.compile("(\\W|^)" + p.getName().toLowerCase() + "(\\W|$)").matcher(msg.toLowerCase()).find()).
+                findFirst();
     }
 
     @PreDestroy
